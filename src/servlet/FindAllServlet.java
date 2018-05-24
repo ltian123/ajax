@@ -1,0 +1,63 @@
+package servlet;
+
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import util.JDBCUtil;
+
+import entity.User;
+
+public class FindAllServlet extends HttpServlet {
+
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset=utf-8");
+		
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		List<User> users = new ArrayList<User>();
+		
+		try {
+			conn = JDBCUtil.getConnection();
+			String sql = new StringBuffer()
+					.append("select * ")
+					.append("from t_user ")
+					.toString();
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while(rs.next()){
+				User user = new User();
+				user.setId(rs.getInt("id"));
+				user.setUsername(rs.getString("username"));
+				users.add(user);
+			}
+			request.setAttribute("users", users);
+			request.getRequestDispatcher("jQuery/list.jsp").forward(request, response);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally{
+			JDBCUtil.closeAll(conn, ps, rs);
+			
+		}
+		
+		
+		
+		
+		
+		
+	}
+}

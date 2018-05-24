@@ -1,0 +1,148 @@
+题目背景
+有某个学生运动会比赛信息的数据库，保存了如下的表：
+运动员sporter表：（运动员编号sporterid ，运动员姓名 name，运动员性别  sex，
+所属系号 department）
+项目item表（项目编号itemid，项目,地点 loc）
+成绩grade表（运动员编号 sporterid，项目编号 itemid，积分 mark）
+功能要求
+1、建表
+    定义各个表的主键，外键的约束；
+    运动员的姓名和所属系别不能为空值 
+    积分要么为空值，要么是6,4,2,0，分别代表第一，二，三名和其他名次的积分 
+    
+    create table sporter(sporterid number(4) primary key,
+    name varchar2(20) not null,
+    sex char(2),
+    department varchar2(20) not null);
+    
+    create table item(itemid varchar2(5),
+    itemname varchar2(20),
+    loc varchar2(20),
+    constraint item_id_pk primary key(itemid));
+
+    create table grade(sporterid number(4) references sporter(sporterid),
+    itemid varchar2(5),
+    mark number(2) check(mark in(6,4,2,0)),
+    constraint item_grade_itemid_fk foreign key(itemid) references item(itemid) on delete cascade);
+
+  
+数据
+运动员（
+     1001，李盼，女，计算机系
+     1002，王玥，女，数学系
+     1003，丁赛，男，计算机系
+     1004，汪丽，女，物理系
+     1005，李娜，女，心理系
+     1006，王骋，女，化学系）
+
+     insert into sporter values(1001,'李盼','女','计算机系');
+      insert into sporter values(1002,'王玥','女','数学系');
+       insert into sporter values(1003,'丁赛','男','计算机系');
+        insert into sporter values(1004,'汪丽','女','物理系');
+	 insert into sporter values(1005,'李娜','女','心理系');
+	  insert into sporter values(1006,'王骋','女','化学系');
+
+项目（
+   x001，男子五千米，一操场
+   x002，男子标枪，一操场
+   x003，男子跳远，二操场
+   x004，女子跳高，二操场
+   x005，女子三千米，三操场）
+
+   insert into item values('x001','男子五千米','一操场');
+   insert into item values('x002','男子标枪','一操场');
+   insert into item values('x003','男子跳远','二操场');
+   insert into item values('x004','女子跳高','二操场');
+   insert into item values('x005','女子三千米','三操场');
+积分（
+1001，x001,6
+1002，x001,4
+1003，x001，2
+1004,x001,0
+1001,x003,4
+1002,x003,6
+1004,x003,2
+1004,x004,6
+1006,x004,4)
+
+insert into grade values(1001,'x001',6);
+insert into grade values(1002,'x001',4);
+insert into grade values(1003,'x001',2);
+insert into grade values(1004,'x001',0);
+insert into grade values(1001,'x003',4);
+insert into grade values(1002,'x003',6);
+insert into grade values(1004,'x003',2);
+insert into grade values(1004,'x004',6);
+insert into grade values(1006,'x004',4);
+
+要求
+1、求出总积分最高的系名，及其积分
+
+select sum(g.mark),s.department
+from sporter s,grade g
+where s.sporterid=g.sporterid
+group by s.department;
+
+
+select  temp.*
+from (select sum(g.mark) sum,s.department
+from sporter s,grade g
+where s.sporterid=g.sporterid
+group by s.department order by sum desc ) temp where rownum=1;
+
+
+
+select max(sum(g.mark))
+from sporter s,grade g
+where s.sporterid=g.sporterid
+group by s.department;
+
+
+select temp.*
+from (select sum(g.mark) sum,s.department
+from sporter s,grade g
+where s.sporterid=g.sporterid
+group by s.department) temp where temp.sum=(select max(sum(g.mark))
+from sporter s,grade g
+where s.sporterid=g.sporterid
+group by s.department);
+
+
+
+2、找出在一操场进行比赛的各项目名称及其冠军的姓名
+select i.itemname,s.name,g.mark
+from item i,sporter s,grade g
+where i.itemid=g.itemid and s.sporterid=g.sporterid and i.loc='一操场' and g.mark=(
+select max(g.mark)
+from item i,sporter s,grade g
+where i.itemid=g.itemid and s.sporterid=g.sporterid and i.loc='一操场');
+
+
+3、找出参加了王玥所参加过的项目的其他同学的姓名
+
+select g.itemid
+from sporter s,grade g
+where s.sporterid=g.sporterid and s.name='王玥';
+
+
+select distinct s.name
+from sporter s,grade g
+where s.sporterid=g.sporterid and s.name<>'王玥' and g.itemid in (select g.itemid
+from sporter s,grade g
+where s.sporterid=g.sporterid and s.name='王玥');
+
+
+
+
+4、经查 王玥因为使用了违禁药品，其成绩都记为0分，请在数据库中做出相应修改
+
+update grade set mark=0  where sporterid=(select sporterid from sporter where name='王玥');
+commit;
+5、经组委会协商，需要删除女子跳高比赛项目
+
+delete from item where itemname='女子跳高';
+
+
+
+
+

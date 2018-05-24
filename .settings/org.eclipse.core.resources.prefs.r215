@@ -1,0 +1,5 @@
+#Tue Oct 18 11:39:44 CST 2016
+eclipse.preferences.version=1
+encoding//src/ajax.txt=GBK
+encoding//src/servlet/CheckNameServlet.java=GBK
+encoding//src/servlet/QueryServlet.java=GBK

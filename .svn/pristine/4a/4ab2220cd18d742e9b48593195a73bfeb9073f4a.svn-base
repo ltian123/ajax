@@ -1,0 +1,21 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  </head>
+  
+  <body>
+    <li>aaa</li>
+    <li>bbb</li>
+    <li>ccc</li>
+    <li>ddd</li>
+    
+    <hr/>
+    <div style="background: gray;width: 40%;padding: 8px;position: absolute;display: none;">
+    	编号:<div style="display: inline;"></div><br/>
+    	姓名:<div style="display: inline;"></div><br/>
+    	电话:<div style="display: inline;"></div><br/>
+    	地址:<div style="display: inline;"></div><br/>
+    </div>
+  </body>
+</html>
